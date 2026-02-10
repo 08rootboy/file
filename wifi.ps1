@@ -19,4 +19,3 @@ if (Test-Path $p) {
     rm $p -Force
 }
 
-(New-Object -ComObject SAPI.SpVoice).Speak("Done")
